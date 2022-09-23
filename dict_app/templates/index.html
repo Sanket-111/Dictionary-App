@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dictionary | Home</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+        body{
+            font-family: 'Poppins', sans-serif;
+            background-color: #fff6e5;
+        }
+
+        .srch_ip{
+            font-size: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .srch{
+            font-size: 1.26rem;
+            border-radius: 0.5rem;
+            background-color: #e09100;
+        }
+        .srch:hover{
+            background-color: #ffbb3e;
+            cursor: pointer;
+        }
+
+        .spk-icon:hover{
+            cursor: pointer;
+        }
+    </style>
+
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    <center>
+        <h1>Dictionary</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <input class="srch_ip" name="word" type="text" placeholder="Search your words here">
+
+        <button class="srch" type="submit">🔍</button>
+    </form>
+
+    </center>
+
+    <h2 style="color: rgb(58, 58, 255);">Search Results:</h2>
+    {% for d in data %}
+        {% if forloop.counter > 1 %}
+            <hr>
+        {% endif %}
+
+        <h3>{{d.word}}</h3>
+        {% if p_link %}
+            <p>Pronunciation: <a style="text-decoration: none;" class="spk-icon" onclick="playAudio(this.id)" id="speaker-icon-{{ forloop.counter }}">🔈</a></p>
+        {% endif %}
+
+        <ul>
+            {% for m in d.meanings %}
+                <li style="font-style: italic;">{{m.partOfSpeech|upper}}</li>
+                <ol>
+                    {% for p in m.definitions %}
+                        <li>{{p.definition}}</li>
+                    {% endfor %}
+                </ol>
+                {% if m.synonyms %}
+                <span style="font-weight: bold; text-decoration: underline;">Synonyms:</span>
+                    {% for s in m.synonyms %}
+                        <span>{{s}}{% if not forloop.last %}, {% else %}. {% endif %} </span>
+                    {% endfor %}
+                {% endif %}
+                {% if m.antonyms %}
+                <span style="font-weight: bold; text-decoration: underline;">Antonyms:</span>
+                    {% for a in m.antonyms %}
+                        <span>{{a}}{% if not forloop.last %}, {% else %}. {% endif %} </span>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endfor %}
+
+    {% if data.title %}
+        <h4 style="color: red;">No search results found!</h4>
+    {% endif %}
+
+    <script>
+        const pronounce_link = "{{p_link}}";
+
+        async function playAudio(elt_id) {
+            var e = document.getElementById(elt_id)
+            var audio = new Audio(`${pronounce_link}`);  
+            audio.type = 'audio/mp3';
+            e.innerHTML = "🔊";
+          
+            try {
+              await audio.play();
+            } catch (err) {
+              console.log('Failed to play...' + err);
+            }
+
+            audio.onended = function(){
+                e.innerHTML = "🔈"
+            }
+          }
+    </script>
+</body>
+</html>
