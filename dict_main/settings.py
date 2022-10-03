@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import django_heroku
 
 import os
 
@@ -25,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'tm-c1w8+bj(h-%g80(1$k*x5=3+zhx@mp9@l0et$(ne4su9=h('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["https://wce-dictionary.herokuapp.com/"]
 
 
 # Application definition
@@ -122,6 +123,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "mess/static/")
+    os.path.join(BASE_DIR, "dict_app/static/")
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# for hosting
+django_heroku.settings(locals())
